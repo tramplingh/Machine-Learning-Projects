@@ -9,7 +9,7 @@ import segmentation_models_pytorch as smp
 
 # --- CONFIGURATION ---
 st.set_page_config(layout="wide", page_title="Flood Mapping AI")
-st.title("🌊 AI-Powered Flood Mapping Tool")
+st.title("AI-Powered Flood Mapping Tool")
 st.write("Upload a satellite or aerial image to detect and visualize flooded areas.")
 
 # --- MODEL AND TRANSFORMS (Copy from your training script) ---
