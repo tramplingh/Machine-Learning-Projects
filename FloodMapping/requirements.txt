@@ -5,3 +5,4 @@ opencv-python-headless
 albumentations
 segmentation-models-pytorch
 numpy
+os
