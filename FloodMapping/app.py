@@ -1,5 +1,6 @@
 import streamlit as st
 import torch
+import os
 import cv2
 import numpy as np
 import albumentations as A
@@ -23,6 +24,9 @@ VAL_TFMS = A.Compose([
 @st.cache_resource # Cache the model for faster re-runs
 def load_model():
     model = smp.Unet(encoder_name="resnet34", in_channels=3, classes=1)
+
+    script_dir = os.path.dirname(__file__)
+    model_path = os.path.join(script_dir, "best_unet.pth")
     model.load_state_dict(torch.load("best_unet.pth", map_location=DEVICE))
     model.eval()
     return model
