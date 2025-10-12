@@ -27,7 +27,7 @@ def load_model():
 
     script_dir = os.path.dirname(__file__)
     model_path = os.path.join(script_dir, "best_unet.pth")
-    model.load_state_dict(torch.load("best_unet.pth", map_location=DEVICE))
+    model.load_state_dict(torch.load(model_path, map_location=DEVICE))
     model.eval()
     return model
 
