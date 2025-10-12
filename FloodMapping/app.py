@@ -71,8 +71,8 @@ if uploaded_file is not None:
     st.success("Processing complete!")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.image(original, caption="Original Image", use_column_width=True)
+        st.image(original, caption="Original Image", use_container_width=True)
     with col2:
-        st.image(heatmap, caption="Flood Heatmap", use_column_width=True)
+        st.image(heatmap, caption="Flood Heatmap", use_container_width=True)
     with col3:
-        st.image(overlay, caption="Overlay", use_column_width=True)
+        st.image(overlay, caption="Overlay", use_container_width=True)
