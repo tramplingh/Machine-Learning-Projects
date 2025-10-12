@@ -1,0 +1,124 @@
+This project implements an image segmentation system for automated flood detection in satellite and aerial imagery using deep learning. The primary objective is to identify and visualize regions affected by flooding by generating a probability heatmap overlay on the input image.
+
+
+---
+
+🔹 Problem Statement
+
+Floods are destructive natural disasters, and rapid flood assessment is critical for disaster response. Traditional manual analysis of satellite data is time-consuming. The goal of this project is to develop a deep learning–based segmentation model that can highlight flood-affected areas in images, enabling faster decision-making.
+
+
+---
+
+🔹 Dataset
+
+FloodNet dataset (aerial imagery with pixel-level flood annotations).
+
+Input: RGB images of flood-affected regions.
+
+Ground-truth: Segmentation masks labeling flooded vs. non-flooded pixels.
+
+Preprocessing:
+
+Resizing to fixed dimensions (e.g., 256×256).
+
+Normalization using ImageNet mean/std.
+
+Data augmentation (rotation, flipping, brightness/contrast adjustment) for generalization.
+
+
+
+
+---
+
+🔹 Model Architecture
+
+U-Net convolutional neural network for semantic segmentation.
+
+Encoder: Pretrained backbone (e.g., ResNet34, EfficientNet-B0) for feature extraction.
+
+Decoder: Upsampling layers with skip connections to reconstruct pixel-level predictions.
+
+
+Output: A probability map (H×W) where each pixel’s value represents the likelihood of flooding.
+
+
+
+---
+
+🔹 Training Setup
+
+Framework: PyTorch with segmentation_models_pytorch.
+
+Loss Function: Combination of Binary Cross-Entropy (BCE) and Dice Loss to handle class imbalance.
+
+Optimizer: Adam with learning rate scheduling.
+
+Metrics:
+
+Intersection over Union (IoU)
+
+Dice Coefficient (F1 Score)
+
+Visual overlays for qualitative assessment.
+
+
+
+
+---
+
+🔹 Inference & Visualization
+
+For a new image, the trained model generates a flood probability map.
+
+Postprocessing:
+
+Convert probability map (0–1) into a heatmap using color mapping (blue → low, red → high).
+
+Overlay heatmap onto original satellite image for interpretability.
+
+
+Output Formats:
+
+Heatmap alone
+
+Overlay visualization
+
+Flood coverage statistics (% of pixels above threshold)
+
+
+
+
+---
+
+🔹 Deployment
+
+Built a lightweight Streamlit web application with:
+
+File uploader (for satellite/aerial images).
+
+Real-time model inference (1–3 seconds per image on GPU/CPU).
+
+Side-by-side display: Original Image | Flood Heatmap | Overlay.
+
+Adjustable overlay transparency for better visualization.
+
+
+
+
+---
+
+🔹 Applications
+
+Disaster management: Rapid flood extent assessment.
+
+Urban planning: Identifying flood-prone regions.
+
+Research: Climate resilience studies and flood prediction models.
+
+
+
+---
+
+✅ In summary:
+This project combines deep learning (U-Net segmentation), PyTorch-based training, and Streamlit deployment to create a practical AI tool that can process satellite images and produce interpretable flood probability heatmaps in real-time for disaster response.
