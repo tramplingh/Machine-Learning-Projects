@@ -1,16 +1,16 @@
-This project implements an image segmentation system for automated flood detection in satellite and aerial imagery using deep learning. The primary objective is to identify and visualize regions affected by flooding by generating a probability heatmap overlay on the input image.
+### This project implements an image segmentation system for automated flood detection in satellite and aerial imagery using deep learning. The primary objective is to identify and visualize regions affected by flooding by generating a probability heatmap overlay on the input image.
 
 
 ---
 
-Problem Statement
+## Problem Statement
 
 Floods are destructive natural disasters, and rapid flood assessment is critical for disaster response. Traditional manual analysis of satellite data is time-consuming. The goal of this project is to develop a deep learning–based segmentation model that can highlight flood-affected areas in images, enabling faster decision-making.
 
 
 ---
 
-Dataset
+## Dataset
 
 Flood-images (aerial imagery with pixel-level flood annotations
 https://www.kaggle.com/datasets/saiharshitjami/flood-images-mask-segmentation?select=Images
@@ -32,7 +32,7 @@ Data augmentation (rotation, flipping, brightness/contrast adjustment) for gener
 
 ---
 
-Model Architecture
+## Model Architecture
 
 U-Net convolutional neural network for semantic segmentation.
 
@@ -47,7 +47,7 @@ Output: A probability map (H×W) where each pixel’s value represents the likel
 
 ---
 
-Training Setup
+## Training Setup
 
 Framework: PyTorch with segmentation_models_pytorch.
 
@@ -55,7 +55,7 @@ Loss Function: Combination of Binary Cross-Entropy (BCE) and Dice Loss to handle
 
 Optimizer: Adam with learning rate scheduling.
 
-Metrics:
+## Metrics:
 
 Intersection over Union (IoU)
 
@@ -68,7 +68,7 @@ Visual overlays for qualitative assessment.
 
 ---
 
-Inference & Visualization
+## Inference & Visualization
 
 For a new image, the trained model generates a flood probability map.
 
@@ -79,7 +79,7 @@ Convert probability map (0–1) into a heatmap using color mapping (blue → low
 Overlay heatmap onto original satellite image for interpretability.
 
 
-Output Formats:
+## Output Formats:
 
 Heatmap alone
 
@@ -92,7 +92,7 @@ Flood coverage statistics (% of pixels above threshold)
 
 ---
 
-Deployment
+## Deployment
 
 Built a lightweight Streamlit web application with:
 
@@ -107,21 +107,7 @@ Adjustable overlay transparency for better visualization.
 
 ---
 
-**Technologies Used:**
-
-*   **Python:** The primary programming language for data processing, model training, and application development.
-*   **PyTorch:** A deep learning framework used to build, train, and evaluate the Unet model.
-*   **Segmentation Models PyTorch:** A library providing pre-trained segmentation models like U-Net.
-*   **Albumentations:** A library for image augmentation, used to enhance the training dataset.
-*   **OpenCV:** Used for image loading, processing, and manipulation.
-*   **NumPy:** For numerical operations and array handling.
-*   **Matplotlib:** For visualizing training metrics and model predictions.
-*   **tqdm:** For displaying progress bars during training and evaluation.
-*   **Streamlit:** A framework used to create a simple web application for demonstrating the flood mapping model.
-*   **Google Colab:** The platform used for developing and running the notebook, providing access to GPUs for faster training.
-*   **Google Drive:** Used to store and access the image and mask datasets.
-
-**Real-Life Use Cases:**
+## Real-Life Use Cases:
 
 *   **Disaster Response and Management:** Quickly identify flooded areas after heavy rainfall or natural disasters to assess the impact, prioritize rescue efforts, and allocate resources effectively.
 *   **Urban Planning:** Analyze historical flood data and predict potential flood zones to inform urban development, infrastructure planning, and land-use regulations.
@@ -129,7 +115,7 @@ Adjustable overlay transparency for better visualization.
 *   **Insurance and Risk Assessment:** Help insurance companies assess flood risk for properties and inform policy decisions.
 *   **Agriculture:** Identify flooded agricultural land to estimate crop damage and plan for recovery.
 
-**Next Steps:**
+## Next Steps:
 
 *   **Improve Model Performance:** Experiment with different encoder architectures, hyperparameters, and loss functions to further improve the model's accuracy.
 *   **Expand Dataset:** Train the model on a larger and more diverse dataset to improve its generalization capabilities.
