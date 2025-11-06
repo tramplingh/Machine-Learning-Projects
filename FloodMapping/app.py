@@ -114,7 +114,7 @@ def predict_and_visualize(image_bytes, alpha=0.5, colormap=cv2.COLORMAP_JET):
     # Create overlay
     overlay = cv2.addWeighted(img, 1 - alpha, heatmap_color, alpha, 0)
 
-    return img, heatmap_color, overlay, pred_resized
+    return img, heatmap_color, overlay
 
 # --- STREAMLIT UI ---
 st.markdown("## 📤 Upload Image")
@@ -156,7 +156,7 @@ if uploaded_file is not None:
     if st.button("🔍 Analyze Image", help="Click to start flood detection"):
         with st.spinner("🔄 Processing image... Please wait."):
             try:
-                original, heatmap, overlay, pred_probs = predict_and_visualize(
+                original, heatmap, overlay = predict_and_visualize(
                     uploaded_file.getvalue(),
                     overlay_alpha,
                     colormap=colormap_dict[colormap_option]
@@ -168,24 +168,14 @@ if uploaded_file is not None:
                 # Display metrics
                 metric_col1, metric_col2, metric_col3 = st.columns(3)
                 with metric_col1:
-                    # Using Otsu's method for adaptive thresholding
-                    blur = cv2.GaussianBlur(heatmap, (5, 5), 0)
-                    thresh_value, _ = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-                    flood_percentage = np.mean(heatmap > thresh_value) * 100
-                    st.metric("Estimated Flood Coverage", f"{flood_percentage:.1f}%",
-                            help="Percentage of image area identified as flooded using adaptive thresholding")
+                    flood_percentage = np.mean(heatmap > 128) * 100
+                    st.metric("Estimated Flood Coverage", f"{flood_percentage:.1f}%")
                 with metric_col2:
                     image_size = f"{original.shape[1]}x{original.shape[0]}"
-                    megapixels = (original.shape[1] * original.shape[0]) / 1_000_000
-                    st.metric("Image Resolution", f"{image_size} ({megapixels:.1f}MP)",
-                            help="Image dimensions in pixels (width x height) and megapixels")
+                    st.metric("Image Resolution", image_size)
                 with metric_col3:
-                    # Calculate confidence using prediction probability distribution
-                    pred_probs = pred_resized.flatten()
-                    high_conf_mask = (pred_probs > 0.8) | (pred_probs < 0.2)  # Areas with clear predictions
-                    confidence = (np.mean(high_conf_mask) * 100)
-                    st.metric("Detection Confidence", f"{confidence:.1f}%",
-                            help="Percentage of pixels where the model makes strong predictions (>80% certain)")
+                    confidence = np.mean(heatmap) / 255 * 100
+                    st.metric("Detection Confidence", f"{confidence:.1f}%")
                 
                 # Tabs for different views
                 tab1, tab2, tab3 = st.tabs(["🖼️ Original", "🌊 Flood Heatmap", "🎯 Overlay"])
