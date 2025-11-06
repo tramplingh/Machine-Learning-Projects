@@ -18,9 +18,13 @@ st.set_page_config(
     }
 )
 
-# Custom CSS for presentation with white background
+# Custom CSS for presentation
 st.markdown("""
     <style>
+    .stApp {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white !important;
+    }
     .main {
         padding: 2rem;
     }
@@ -28,70 +32,81 @@ st.markdown("""
         width: 100%;
         border-radius: 5px;
         height: 3em;
-        background-color: #0083B8;
+        background-color: #00bfff;
         color: white;
         font-weight: bold;
         border: none;
         transition: all 0.3s ease;
     }
     .stButton>button:hover {
-        background-color: #006491;
+        background-color: #0099cc;
         transform: translateY(-2px);
     }
     .stAlert {
         padding: 1rem;
         border-radius: 5px;
-        border: 1px solid #f0f2f6;
+        background-color: rgba(255, 255, 255, 0.1);
     }
     .success-text {
-        color: #0083B8;
+        color: #00bfff;
         font-size: 18px;
         font-weight: bold;
     }
+    .css-1d391kg, .css-1lcbmhc {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
     .stTabs [data-baseweb="tab-list"] {
         gap: 2rem;
+        background-color: transparent;
     }
     .stTabs [data-baseweb="tab"] {
+        color: white;
+        background-color: transparent;
         border-radius: 5px;
         padding: 10px 20px;
-        color: #0083B8;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #0083B8 !important;
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    h1, h2, h3, h4, h5, h6, .st-emotion-cache-ztfqz8 {
         color: white !important;
     }
-    .styled-card {
-        border: 1px solid #f0f2f6;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        background-color: #ffffff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    .st-emotion-cache-16txtl3 {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    /* Sidebar styling */
+    .css-1d391kg {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+    .sidebar .sidebar-content {
+        background-color: rgba(0, 0, 0, 0.2);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Sidebar with clean white styling
+# Sidebar with presentation styling
 with st.sidebar:
     st.markdown("""
         <div style='text-align: center; margin-bottom: 20px;'>
-            <h1 style='font-size: 2.5em; margin-bottom: 10px; color: #0083B8;'>🌊</h1>
-            <h2 style='margin-top: 0; color: #0083B8;'>Flood Mapping AI</h2>
+            <h1 style='color: white; font-size: 2.5em; margin-bottom: 10px;'>🌊</h1>
+            <h2 style='color: white; margin-top: 0;'>Flood Mapping AI</h2>
         </div>
     """, unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown("""
-    <div class='styled-card'>
-        <h3 style='color: #0083B8; margin-top: 0;'>Project Overview</h3>
-        <p style='color: #444;'>
+    <div style='background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
+        <h3 style='color: white; margin-top: 0;'>Project Overview</h3>
+        <p style='color: white;'>
         Advanced deep learning solution for real-time flood detection in satellite imagery using state-of-the-art computer vision techniques.
         </p>
     </div>
     
-    <div class='styled-card'>
-        <h3 style='color: #0083B8; margin-top: 0;'>Key Features</h3>
-        <ul style='color: #444;'>
+    <div style='background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
+        <h3 style='color: white; margin-top: 0;'>Key Features</h3>
+        <ul style='color: white;'>
             <li>Real-time flood detection</li>
             <li>Interactive visualization</li>
             <li>High-precision mapping</li>
@@ -99,9 +114,9 @@ with st.sidebar:
         </ul>
     </div>
     
-    <div class='styled-card'>
-        <h3 style='color: #0083B8; margin-top: 0;'>Technology Stack</h3>
-        <ul style='color: #444;'>
+    <div style='background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px;'>
+        <h3 style='color: white; margin-top: 0;'>Technology Stack</h3>
+        <ul style='color: white;'>
             <li>Model: UNet Architecture</li>
             <li>Backbone: ResNet34</li>
             <li>Framework: PyTorch</li>
@@ -112,9 +127,9 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("""
-        <div style='text-align: center; color: #444;'>
+        <div style='text-align: center; color: white;'>
             Presented by<br>
-            <b style='color: #0083B8;'>Anish Dev Edward</b>
+            <b>Anish Dev Edward</b>
         </div>
     """, unsafe_allow_html=True)
 
@@ -219,8 +234,12 @@ if uploaded_file is not None:
                 st.markdown("### 🎯 Analysis Results")
                 st.markdown(
                     """
-                    <div class='styled-card'>
-                        <h4 style='color: #0083B8; margin: 0;'>
+                    <div style='background-color: rgba(255, 255, 255, 0.1); 
+                             padding: 20px; 
+                             border-radius: 10px; 
+                             margin-bottom: 20px;
+                             border: 1px solid rgba(255, 255, 255, 0.2);'>
+                        <h4 style='color: white; margin: 0;'>
                             🔍 Deep Learning Flood Detection Analysis
                         </h4>
                     </div>
