@@ -1,4 +1,15 @@
-### This project implements an image segmentation system for automated flood detection in satellite and aerial imagery using deep learning. The primary objective is to identify and visualize regions affected by flooding by generating a probability heatmap overlay on the input image.
+### TL;DR 
+
+
+
+This project implements an image segmentation system for automated flood detection in satellite and aerial imagery using _deep learning and transfer learning_. The primary objective is to identify and visualize regions affected by flooding by generating a probability heatmap overlay on the input image.
+
+
+
+
+
+*Check it out here by uploading* an aerial image of a flood affected area: https://floodmapping-xnqphjv4amhud88gbgfd2n.streamlit.app/ 
+
 
 
 ---
