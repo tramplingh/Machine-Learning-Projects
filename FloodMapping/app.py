@@ -18,13 +18,9 @@ st.set_page_config(
     }
 )
 
-# Custom CSS for presentation
+# Custom CSS
 st.markdown("""
     <style>
-    .stApp {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        color: white !important;
-    }
     .main {
         padding: 2rem;
     }
@@ -32,106 +28,41 @@ st.markdown("""
         width: 100%;
         border-radius: 5px;
         height: 3em;
-        background-color: #00bfff;
-        color: white;
-        font-weight: bold;
-        border: none;
-        transition: all 0.3s ease;
-    }
-    .stButton>button:hover {
-        background-color: #0099cc;
-        transform: translateY(-2px);
+        background-color: #0083B8;
     }
     .stAlert {
         padding: 1rem;
         border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.1);
     }
     .success-text {
-        color: #00bfff;
+        color: #0083B8;
         font-size: 18px;
         font-weight: bold;
-    }
-    .css-1d391kg, .css-1lcbmhc {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 2rem;
-        background-color: transparent;
-    }
-    .stTabs [data-baseweb="tab"] {
-        color: white;
-        background-color: transparent;
-        border-radius: 5px;
-        padding: 10px 20px;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: rgba(255, 255, 255, 0.2);
-    }
-    h1, h2, h3, h4, h5, h6, .st-emotion-cache-ztfqz8 {
-        color: white !important;
-    }
-    .st-emotion-cache-16txtl3 {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-    }
-    /* Sidebar styling */
-    .css-1d391kg {
-        background-color: rgba(0, 0, 0, 0.2);
-    }
-    .sidebar .sidebar-content {
-        background-color: rgba(0, 0, 0, 0.2);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Sidebar with presentation styling
+# Sidebar
 with st.sidebar:
-    st.markdown("""
-        <div style='text-align: center; margin-bottom: 20px;'>
-            <h1 style='color: white; font-size: 2.5em; margin-bottom: 10px;'>🌊</h1>
-            <h2 style='color: white; margin-top: 0;'>Flood Mapping AI</h2>
-        </div>
-    """, unsafe_allow_html=True)
-    
+    st.image("https://raw.githubusercontent.com/tramplingh/Machine-Learning-Projects/main/FloodMapping/images/logo.png", width=100)
+    st.title("🌊 Flood Mapping AI")
     st.markdown("---")
     st.markdown("""
-    <div style='background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
-        <h3 style='color: white; margin-top: 0;'>Project Overview</h3>
-        <p style='color: white;'>
-        Advanced deep learning solution for real-time flood detection in satellite imagery using state-of-the-art computer vision techniques.
-        </p>
-    </div>
+    ### About
+    This AI-powered tool helps identify flooded areas in satellite or aerial imagery using deep learning.
     
-    <div style='background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
-        <h3 style='color: white; margin-top: 0;'>Key Features</h3>
-        <ul style='color: white;'>
-            <li>Real-time flood detection</li>
-            <li>Interactive visualization</li>
-            <li>High-precision mapping</li>
-            <li>Multiple visualization modes</li>
-        </ul>
-    </div>
+    ### How to use:
+    1. Upload a satellite/aerial image
+    2. Adjust visualization settings
+    3. Analyze the results
     
-    <div style='background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px;'>
-        <h3 style='color: white; margin-top: 0;'>Technology Stack</h3>
-        <ul style='color: white;'>
-            <li>Model: UNet Architecture</li>
-            <li>Backbone: ResNet34</li>
-            <li>Framework: PyTorch</li>
-            <li>Interface: Streamlit</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    ### Technical Details:
+    - Model: UNet with ResNet34 backbone
+    - Input size: 256x256 pixels
+    - Output: Flood probability map
+    """)
     st.markdown("---")
-    st.markdown("""
-        <div style='text-align: center; color: white;'>
-            Presented by<br>
-            <b>Anish Dev Edward</b>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("Made with ❤️ by [Anish Dev Edward](https://github.com/tramplingh)")
 
 # Main Content
 st.title("🌊 AI-Powered Flood Mapping Tool")
@@ -183,7 +114,7 @@ def predict_and_visualize(image_bytes, alpha=0.5, colormap=cv2.COLORMAP_JET):
     # Create overlay
     overlay = cv2.addWeighted(img, 1 - alpha, heatmap_color, alpha, 0)
 
-    return img, heatmap_color, overlay
+    return img, heatmap_color, overlay, pred_resized
 
 # --- STREAMLIT UI ---
 st.markdown("## 📤 Upload Image")
@@ -225,30 +156,39 @@ if uploaded_file is not None:
     if st.button("🔍 Analyze Image", help="Click to start flood detection"):
         with st.spinner("🔄 Processing image... Please wait."):
             try:
-                original, heatmap, overlay = predict_and_visualize(
+                original, heatmap, overlay, pred_probs = predict_and_visualize(
                     uploaded_file.getvalue(),
                     overlay_alpha,
                     colormap=colormap_dict[colormap_option]
                 )
                 
-                st.markdown("### 🎯 Analysis Results")
-                st.markdown(
-                    """
-                    <div style='background-color: rgba(255, 255, 255, 0.1); 
-                             padding: 20px; 
-                             border-radius: 10px; 
-                             margin-bottom: 20px;
-                             border: 1px solid rgba(255, 255, 255, 0.2);'>
-                        <h4 style='color: white; margin: 0;'>
-                            🔍 Deep Learning Flood Detection Analysis
-                        </h4>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                st.markdown("### 📊 Analysis Results")
+                st.markdown(f"*Processed on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
                 
-                # Tabs for different views with enhanced styling
-                tab1, tab2, tab3 = st.tabs(["🖼️ Original Image", "🌊 Flood Detection", "🎯 Combined View"])
+                # Display metrics
+                metric_col1, metric_col2, metric_col3 = st.columns(3)
+                with metric_col1:
+                    # Using Otsu's method for adaptive thresholding
+                    blur = cv2.GaussianBlur(heatmap, (5, 5), 0)
+                    thresh_value, _ = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                    flood_percentage = np.mean(heatmap > thresh_value) * 100
+                    st.metric("Estimated Flood Coverage", f"{flood_percentage:.1f}%",
+                            help="Percentage of image area identified as flooded using adaptive thresholding")
+                with metric_col2:
+                    image_size = f"{original.shape[1]}x{original.shape[0]}"
+                    megapixels = (original.shape[1] * original.shape[0]) / 1_000_000
+                    st.metric("Image Resolution", f"{image_size} ({megapixels:.1f}MP)",
+                            help="Image dimensions in pixels (width x height) and megapixels")
+                with metric_col3:
+                    # Calculate confidence using prediction probability distribution
+                    pred_probs = pred_resized.flatten()
+                    high_conf_mask = (pred_probs > 0.8) | (pred_probs < 0.2)  # Areas with clear predictions
+                    confidence = (np.mean(high_conf_mask) * 100)
+                    st.metric("Detection Confidence", f"{confidence:.1f}%",
+                            help="Percentage of pixels where the model makes strong predictions (>80% certain)")
+                
+                # Tabs for different views
+                tab1, tab2, tab3 = st.tabs(["🖼️ Original", "🌊 Flood Heatmap", "🎯 Overlay"])
                 
                 with tab1:
                     st.image(original, caption="Original Image", use_column_width=True)
