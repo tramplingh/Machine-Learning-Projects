@@ -18,7 +18,7 @@ st.set_page_config(
     }
 )
 
-# Custom CSS that adapts to light/dark mode
+# Custom CSS for presentation with white background
 st.markdown("""
     <style>
     .main {
@@ -41,6 +41,7 @@ st.markdown("""
     .stAlert {
         padding: 1rem;
         border-radius: 5px;
+        border: 1px solid #f0f2f6;
     }
     .success-text {
         color: #0083B8;
@@ -53,73 +54,44 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] {
         border-radius: 5px;
         padding: 10px 20px;
+        color: #0083B8;
     }
     .stTabs [aria-selected="true"] {
         background-color: #0083B8 !important;
-        color: var(--text-color) !important;
+        color: white !important;
     }
-    /* Adaptive styling for cards */
     .styled-card {
+        border: 1px solid #f0f2f6;
         border-radius: 10px;
         padding: 1.5rem;
         margin-bottom: 1rem;
-        border: 1px solid var(--border-color);
-        background-color: var(--background-color);
-    }
-    
-    /* Theme-aware variables */
-    [data-theme="light"] {
-        --background-color: #ffffff;
-        --text-color: #444444;
-        --border-color: #f0f2f6;
-        --shadow: 0 2px 4px rgba(0,0,0,0.05);
-        --highlight-color: #0083B8;
-    }
-    
-    [data-theme="dark"] {
-        --background-color: #262730;
-        --text-color: #ffffff;
-        --border-color: #464B5C;
-        --shadow: 0 2px 4px rgba(0,0,0,0.2);
-        --highlight-color: #00A6Ed;
-    }
-    
-    /* Adaptive text colors */
-    .styled-card h3, .styled-card h4 {
-        color: var(--highlight-color);
-    }
-    
-    .styled-card p, .styled-card ul {
-        color: var(--text-color);
-    }
-    
-    .styled-card {
-        box-shadow: var(--shadow);
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Sidebar with adaptive styling
+# Sidebar with clean white styling
 with st.sidebar:
     st.markdown("""
         <div style='text-align: center; margin-bottom: 20px;'>
-            <h1 style='font-size: 2.5em; margin-bottom: 10px; color: var(--highlight-color);'>🌊</h1>
-            <h2 style='margin-top: 0; color: var(--highlight-color);'>Flood Mapping AI</h2>
+            <h1 style='font-size: 2.5em; margin-bottom: 10px; color: #0083B8;'>🌊</h1>
+            <h2 style='margin-top: 0; color: #0083B8;'>Flood Mapping AI</h2>
         </div>
     """, unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown("""
     <div class='styled-card'>
-        <h3 style='margin-top: 0;'>Project Overview</h3>
-        <p>
+        <h3 style='color: #0083B8; margin-top: 0;'>Project Overview</h3>
+        <p style='color: #444;'>
         Advanced deep learning solution for real-time flood detection in satellite imagery using state-of-the-art computer vision techniques.
         </p>
     </div>
     
     <div class='styled-card'>
-        <h3 style='margin-top: 0;'>Key Features</h3>
-        <ul>
+        <h3 style='color: #0083B8; margin-top: 0;'>Key Features</h3>
+        <ul style='color: #444;'>
             <li>Real-time flood detection</li>
             <li>Interactive visualization</li>
             <li>High-precision mapping</li>
@@ -128,8 +100,8 @@ with st.sidebar:
     </div>
     
     <div class='styled-card'>
-        <h3 style='margin-top: 0;'>Technology Stack</h3>
-        <ul>
+        <h3 style='color: #0083B8; margin-top: 0;'>Technology Stack</h3>
+        <ul style='color: #444;'>
             <li>Model: UNet Architecture</li>
             <li>Backbone: ResNet34</li>
             <li>Framework: PyTorch</li>
@@ -140,9 +112,9 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("""
-        <div style='text-align: center;'>
+        <div style='text-align: center; color: #444;'>
             Presented by<br>
-            <b style='color: var(--highlight-color);'>Anish Dev Edward</b>
+            <b style='color: #0083B8;'>Anish Dev Edward</b>
         </div>
     """, unsafe_allow_html=True)
 
@@ -248,7 +220,7 @@ if uploaded_file is not None:
                 st.markdown(
                     """
                     <div class='styled-card'>
-                        <h4 style='margin: 0;'>
+                        <h4 style='color: #0083B8; margin: 0;'>
                             🔍 Deep Learning Flood Detection Analysis
                         </h4>
                     </div>
