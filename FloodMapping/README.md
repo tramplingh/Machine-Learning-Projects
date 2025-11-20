@@ -11,7 +11,7 @@ This project implements an image segmentation system for automated flood detecti
 *Check it out here by uploading* an aerial image of a flood affected area: https://floodmapping-xnqphjv4amhud88gbgfd2n.streamlit.app/ 
 
 
-
+*Detailed description of the process and methodology used:* https://docs.google.com/document/d/1A4e_wOdkY6JHDK0CG1uS1G-A6v38XIRbClofJLuHoXo/edit?usp=drivesdk
 ---
 
 ## Problem Statement
