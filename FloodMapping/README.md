@@ -1,136 +1,237 @@
-### TL;DR 
+# Aerial Water Segmentation for Flood Assessment
 
+A U-Net segmentation model that identifies standing water in aerial photographs of
+flood-affected areas, producing a pixel-level mask, a confidence heatmap, and a
+coverage statistic.
 
+**Live demo:** https://floodmapping-xnqphjv4amhud88gbgfd2n.streamlit.app/
+**Methodology write-up:** https://docs.google.com/document/d/1A4e_wOdkY6JHDK0CG1uS1G-A6v38XIRbClofJLuHoXo/edit?usp=drivesdk
 
-This project implements an image segmentation system for automated flood detection in satellite and aerial imagery using _deep learning and transfer learning_. The primary objective is to identify and visualize regions affected by flooding by generating a probability heatmap overlay on the input image.
+**Test-set result: 0.881 mean IoU across 341 held-out images**, against 0.451 for a tuned
+classical colour-threshold baseline.
 
-
-
-
-
-*Check it out here by uploading* an aerial image of a flood affected area: https://floodmapping-xnqphjv4amhud88gbgfd2n.streamlit.app/ 
-
-
-*Detailed description of the process and methodology used:* https://docs.google.com/document/d/1A4e_wOdkY6JHDK0CG1uS1G-A6v38XIRbClofJLuHoXo/edit?usp=drivesdk
 ---
 
-## Problem Statement
+## What this model does and does not do
 
-Floods are destructive natural disasters, and rapid flood assessment is critical for disaster response. Traditional manual analysis of satellite data is time-consuming. The goal of this project is to develop a deep learning–based segmentation model that can highlight flood-affected areas in images, enabling faster decision-making.
+**It does:** segment visible standing water in optical aerial imagery, at pixel level,
+and report what share of the frame that water covers.
 
+**It does not:** distinguish floodwater from normal water. The training set contains
+only flooded scenes, so the model was never shown a dry landscape and never had the
+chance to learn what "abnormal" water looks like. Rivers, lakes, ponds and reservoirs
+are detected as confidently as floodwater. Turning this into a true flood detector would
+require either before/after image pairs of the same location, or a baseline water mask
+to difference against.
+
+**It also does not** work on georeferenced data. Inputs are ordinary photographs with no
+coordinates, so coverage is reported as a percentage of the image, not as an area on the
+ground. Flooded area in km² is not something this system can produce.
+
+This is stated up front because the distinction matters for anyone considering the
+outputs operationally.
+
+---
+
+## Problem
+
+Rapid post-disaster damage assessment depends on quickly identifying inundated areas.
+Manual inspection of aerial imagery is slow. This project trains a semantic segmentation
+model to automate the pixel-level water delineation step, so an analyst can triage a
+batch of images by water coverage rather than reviewing each one.
 
 ---
 
 ## Dataset
 
-Flood-images (aerial imagery with pixel-level flood annotations
-https://www.kaggle.com/datasets/saiharshitjami/flood-images-mask-segmentation?select=Images
+[Flood images with segmentation masks](https://www.kaggle.com/datasets/saiharshitjami/flood-images-mask-segmentation)
+— RGB aerial photographs of flood-affected regions with hand-labelled binary masks.
 
-Input: RGB images of flood-affected regions.
+| | |
+|---|---|
+| Total paired image/mask files | 3,402 |
+| Train / Validation / Test | 2,721 / 340 / 341 (80 / 10 / 10) |
+| Split method | Random shuffle, `random.seed(42)` |
+| Input resolution | Resized to 256 × 256 |
+| Normalisation | ImageNet mean/std |
 
-Ground-truth: Segmentation masks labeling flooded vs. non-flooded pixels.
-
-Preprocessing:
-
-Resizing to fixed dimensions (e.g., 256×256).
-
-Normalization using ImageNet mean/std.
-
-Data augmentation (rotation, flipping, brightness/contrast adjustment) for generalization.
-
-
-
-
----
-
-## Model Architecture
-
-U-Net convolutional neural network for semantic segmentation.
-
-Encoder: Pretrained backbone (e.g., ResNet34, EfficientNet-B0) for feature extraction.
-
-Decoder: Upsampling layers with skip connections to reconstruct pixel-level predictions.
-
-
-Output: A probability map (H×W) where each pixel’s value represents the likelihood of flooding.
-
-
+**Known limitation of the split.** Files are shuffled individually, not grouped by source
+event. The dataset contains multiple frames of the same location — two of the ten
+worst-scoring test images are visibly the same neighbourhood photographed from different
+angles — so near-duplicates may straddle the train/test boundary. The scores below should
+be read as an upper bound until a perceptual-hash audit rules this out.
 
 ---
 
-## Training Setup
+## Model
 
-Framework: PyTorch with segmentation_models_pytorch.
+- **Architecture:** U-Net (`segmentation_models_pytorch`)
+- **Encoder:** ResNet-34, ImageNet-pretrained
+- **Output:** single-channel logit map, sigmoid to a per-pixel probability
+- **Loss:** Binary Cross-Entropy + Dice, summed
+- **Optimiser:** Adam, fixed learning rate 1e-4 (no scheduler)
+- **Augmentation:** horizontal flip (p=0.5), random brightness/contrast (p=0.2)
+- **Epochs:** 10, with the best-validation-IoU checkpoint retained
 
-Loss Function: Combination of Binary Cross-Entropy (BCE) and Dice Loss to handle class imbalance.
-
-Optimizer: Adam with learning rate scheduling.
-
-## Metrics:
-
-Intersection over Union (IoU)
-
-Dice Coefficient (F1 Score)
-
-Visual overlays for qualitative assessment.
-
-
-
+Validation loss reaches its minimum around epoch 8–9 and rises afterwards, so 10 epochs
+is roughly the useful ceiling for this configuration. Best-checkpoint saving prevents the
+final overfitted weights from being used.
 
 ---
 
-## Inference & Visualization
+## Results
 
-For a new image, the trained model generates a flood probability map.
+Held-out test set, 341 images, evaluated at 256 × 256 to match the training resolution.
 
-Postprocessing:
+| Metric | U-Net | HSV baseline |
+|---|---|---|
+| **Mean IoU** | **0.8810** | 0.4513 |
+| Mean Dice | 0.9348 | 0.5593 |
+| Mean Precision | 0.9333 | 0.6879 |
+| Mean Recall | 0.9376 | 0.5728 |
+| Median IoU | 0.8945 | — |
+| Std. dev. of per-image IoU | 0.0754 | — |
 
-Convert probability map (0–1) into a heatmap using color mapping (blue → low, red → high).
+**The U-Net outperforms the baseline on 341 of 341 test images** — every case, without
+exception.
 
-Overlay heatmap onto original satellite image for interpretability.
+### Why the baseline is a fair comparison
 
+A learned model should have to prove it beats the obvious heuristic. Floodwater in these
+scenes is a distinctive muddy brown, so a colour threshold is the natural thing to try
+first, and if it were competitive the deep model would not be justified.
 
-## Output Formats:
+The baseline is an HSV colour-range threshold with morphological open/close cleanup. Its
+six parameters were selected by grid search over 192 combinations, scored on 100
+**training** images, and frozen before the test set was touched. It was never tuned on
+test data.
 
-Heatmap alone
+It is not a strawman: at 0.688 precision it is right about two-thirds of the time when it
+flags a pixel. Its failure is recall — 0.573, meaning it misses close to half the water
+present. Muddy water, wet soil, bare earth and shadowed vegetation occupy overlapping
+regions of HSV space that no fixed threshold can separate. The U-Net's advantage comes
+from spatial context and texture, not from better colour sensitivity.
 
-Overlay visualization
+The distribution makes the gap concrete: the baseline has a long tail of near-zero scores,
+while the U-Net is tightly clustered above 0.80. See `Eval/iou_distribution.png`.
 
-Flood coverage statistics (% of pixels above threshold)
+**Threshold.** A sweep across 0.05–0.95 confirms 0.50 as the optimal operating point, with
+a clean precision/recall crossover there. It was verified rather than assumed. See
+`Eval/threshold_sweep.png`.
 
+**Consistency.** A standard deviation of 0.075 with a minimum of 0.33 means performance is
+stable across the test set rather than an average of very good and very bad cases.
 
+### A note on the evaluation code
 
+An earlier version of the IoU function summed over the wrong tensor dimensions
+(`.sum((1, 2))` on a `(B, 1, H, W)` tensor), computing IoU per *column of pixels* rather
+than per image. On this model it produced 0.864 against a true 0.881 — a modest distortion,
+but the reported quantity was not IoU. The corrected version sums over `(1, 2, 3)`.
+`evaluate.py` prints both so the difference is reproducible.
 
 ---
 
-## Deployment
+## Known failure modes
 
-Built a lightweight Streamlit web application with:
+`evaluate.py` produces a gallery of the ten worst-scoring test images with a colour-coded
+error map (green = correct detection, red = false positive, blue = missed water). See
+`Eval/failure_gallery.png`.
 
-File uploader (for satellite/aerial images).
+**Most "failures" are boundary error, not misdetection.** Eight of the ten worst cases show
+green cores with thin red and blue fringes: the model located the water correctly and was
+imprecise at the edge by a few pixels. On narrow channels between buildings the union is
+small, so a few pixels of edge error costs a disproportionate amount of IoU.
 
-Real-time model inference (1–3 seconds per image on GPU/CPU).
+The genuine failures are two cases of **wide, shallow inundation over vegetation** — flooded
+fields and cropland where the water surface is partly obscured and reads green rather than
+brown. These produce the large blue regions in the two lowest-scoring images (0.33 and 0.45)
+and represent the model's real weakness: it keys on visible water, so water it cannot see
+directly is water it cannot segment.
 
-Side-by-side display: Original Image | Flood Heatmap | Overlay.
-
-Adjustable overlay transparency for better visualization.
-
+A third factor is **label ambiguity**. Some ground-truth masks mark visually green, wet
+fields as water, which is defensible for flood assessment but inconsistent with the
+appearance-based cue the model learned. Part of the residual error is annotation variance
+rather than model error.
 
 ---
 
-## Real-Life Use Cases:
+## Application
 
-*   Disaster Response and Management: Quickly identify flooded areas after heavy rainfall or natural disasters to assess the impact, prioritize rescue efforts, and allocate resources effectively.
-*   Urban Planning: Analyze historical flood data and predict potential flood zones to inform urban development, infrastructure planning, and land-use regulations.
-*   Environmental Monitoring: Track changes in water bodies and identify areas prone to flooding due to climate change or other environmental factors.
-*   Insurance and Risk Assessment: Help insurance companies assess flood risk for properties and inform policy decisions.
-*   Agriculture: Identify flooded agricultural land to estimate crop damage and plan for recovery.
+A Streamlit web app for single-image inference:
 
-## Next Steps:
+- Upload a JPG or PNG aerial image
+- Adjustable detection threshold and overlay opacity
+- Three views: outlined overlay, confidence heatmap, binary mask
+- Water coverage percentage, mean confidence, and count of distinct regions
+- Downloadable binary mask as PNG
+- Explicit warnings when nothing is detected or when the entire frame is flagged
 
-*   Improve Model Performance: Experiment with different encoder architectures, hyperparameters, and loss functions to further improve the model's accuracy.
-*   Expand Dataset: Train the model on a larger and more diverse dataset to improve its generalization capabilities.
-*   Implement More Sophisticated Post-processing: Explore advanced techniques for refining the model's output, such as conditional random fields (CRFs).
-*   Deploy as a Web Service: Deploy the trained model as a robust web service for wider accessibility and integration into other applications.
-*   Real-time Processing: Investigate methods for near real-time flood detection using streaming data.
-*   Explore Different Data Sources: Incorporate other data sources like satellite radar data or social media reports to enhance flood detection.
+Detections below the threshold render as transparent rather than as a coloured
+low-confidence region, so a scene with no water produces a visibly empty result instead of
+a full-frame colour map.
+
+---
+
+## Repository
+
+```
+FloodMapping/
+├── app.py                      # Streamlit inference app
+├── evaluate.py                 # Test-set evaluation, baseline comparison, failure analysis
+├── floodmapdl.py               # Training script (originally a Colab notebook)
+├── requirements.txt            # Pinned dependencies (CPU PyTorch)
+├── best_unet.pth               # Trained weights (Git LFS)
+├── Eval/                       # Evaluation outputs
+│   ├── summary.json            #   Headline metrics
+│   ├── per_image_metrics.json  #   Per-image IoU / Dice / precision / recall
+│   ├── baseline_metrics.json   #   Baseline params and per-image scores
+│   ├── iou_distribution.png
+│   ├── threshold_sweep.png
+│   └── failure_gallery.png
+└── images/                     # Qualitative predictions and training curves
+```
+
+`best_unet.pth` is tracked with Git LFS. Clone with `git lfs install` first, or the file
+arrives as a text pointer rather than weights.
+
+### Running locally
+
+```bash
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+### Reproducing the evaluation
+
+Edit the paths at the top of `evaluate.py`, then:
+
+```bash
+python evaluate.py
+```
+
+This does not retrain. It runs one forward pass over the test set, caches per-image
+probability maps, and writes metrics and figures to `eval_out/`. Roughly 10–15 minutes on
+CPU for 341 images.
+
+---
+
+## Where this could go next
+
+1. **Audit the split for near-duplicates.** Perceptual-hash the train and test sets and
+   re-split by source event if leakage is found. This determines whether 0.881 is real.
+2. **Retrain on FloodNet** — drone imagery from Hurricane Harvey with classes that separate
+   *flooded* buildings and roads from *non-flooded* ones. This is the change that would make
+   the model a genuine flood detector rather than a water segmenter.
+3. **Move to SAR (Sen1Floods11)** — Sentinel-1 radar penetrates cloud cover. Optical imagery
+   fails precisely during the storms that cause floods, and SAR data is georeferenced, which
+   unlocks area measurement.
+
+---
+
+## Stack
+
+Python · PyTorch · segmentation-models-pytorch · Albumentations · OpenCV · NumPy ·
+Matplotlib · Streamlit
